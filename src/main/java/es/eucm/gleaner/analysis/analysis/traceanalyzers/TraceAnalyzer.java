@@ -12,6 +12,9 @@ public interface TraceAnalyzer extends Serializable {
 
     public static final String ZONE = "zone";
 
+    public static final String ZONE_PREFIX = "_z_";
+    public static final String ZONE_TIME_PREFIX = ZONE_PREFIX + "ms_";
+
     public abstract void defaultValues(BSONObject gameplayResult);
 
     public abstract boolean interestedIn(String event);
