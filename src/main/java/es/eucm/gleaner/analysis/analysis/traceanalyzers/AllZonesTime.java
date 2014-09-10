@@ -34,4 +34,9 @@ public class AllZonesTime implements TraceAnalyzer {
         currentScene = Q.getValue(trace);
         lastTime = newTime;
 	}
+
+    @Override
+    public String getVarsGenerated() {
+        return ZONE_TIME_PREFIX + ".*";
+    }
 }

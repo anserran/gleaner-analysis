@@ -20,10 +20,10 @@ public class TraceExtractorTest {
         extractor.addDerivedVarFunction(new TestDerivedVarFunction2());
 
         extractor.init();
-        extractor.addExpression(null, "test1('arg1') + test1('arg2')");
-        extractor.addExpression(null, "test1('arg1') || test2('arg3')");
-        extractor.addExpression(null, "test1('arg1') && test2('arg4')");
-        extractor.addExpression(null, "test1('arg1') ? test2('arg5') : test2('arg6')");
+        extractor.addExpression("", "test1('arg1') + test1('arg2')");
+        extractor.addExpression("", "test1('arg1') || test2('arg3')");
+        extractor.addExpression("", "test1('arg1') && test2('arg4')");
+        extractor.addExpression("", "test1('arg1') ? test2('arg5') : test2('arg6')");
         extractor.getTraceAnalyzers();
     }
 

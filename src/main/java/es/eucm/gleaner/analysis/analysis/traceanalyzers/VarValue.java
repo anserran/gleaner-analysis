@@ -18,15 +18,20 @@ public class VarValue implements TraceAnalyzer{
 
     @Override
     public boolean interestedIn(String event) {
-        return "var".equals(event);
+        return VAR.equals(event);
     }
 
     @Override
     public void analyze(BSONObject trace, BSONObject gameplayResult) {
-        String varName = Q.get("target", trace);
+        String varName = Q.getTarget(trace);
         if (target.equals(varName)){
-            Object value = Q.get("value", trace);
+            Object value = Q.getValue(trace);
             gameplayResult.put(target, value);
         }
+    }
+
+    @Override
+    public String getVarsGenerated() {
+        return target;
     }
 }

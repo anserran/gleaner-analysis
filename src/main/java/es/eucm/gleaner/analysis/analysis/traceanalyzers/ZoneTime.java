@@ -12,20 +12,18 @@ public class ZoneTime implements TraceAnalyzer {
 	private long lastTime;
 	private long acc;
 
-    private String varName;
-	private String zoneTime;
+	private String zoneId;
 
-	public ZoneTime(String varName, String zoneTime) {
-        this.varName = varName;
-		this.zoneTime = zoneTime;
-        this.counting = false;
+	public ZoneTime(String zoneId) {
+		this.zoneId = zoneId;
+		this.counting = false;
 	}
 
 	@Override
 	public void defaultValues(BSONObject gameplayResult) {
-        counting = false;
-        lastTime = 0;
-		gameplayResult.put(varName, acc = 0);
+		counting = false;
+		lastTime = 0;
+		gameplayResult.put(ZONE_TIME_PREFIX + zoneId, acc = 0);
 	}
 
 	@Override
@@ -38,14 +36,19 @@ public class ZoneTime implements TraceAnalyzer {
 		long newTime = ((ObjectId) Q.get("_id", trace)).getTime();
 		if (counting) {
 			acc += newTime - lastTime;
-			gameplayResult.put(varName, acc);
-            lastTime = newTime;
+			gameplayResult.put(ZONE_TIME_PREFIX + zoneId, acc);
+			lastTime = newTime;
 		}
 
 		String event = Q.get("event", trace);
 		if (ZONE.equals(event)) {
-			counting = zoneTime.equals(Q.get("value", trace));
+			counting = zoneId.equals(Q.get("value", trace));
 			lastTime = newTime;
 		}
+	}
+
+	@Override
+	public String getVarsGenerated() {
+		return ZONE_TIME_PREFIX + zoneId;
 	}
 }

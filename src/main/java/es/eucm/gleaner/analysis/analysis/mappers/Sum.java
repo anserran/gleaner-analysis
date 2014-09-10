@@ -5,32 +5,28 @@ import org.bson.BSONObject;
 /**
  * Adds the value
  */
-public class Sum implements MapReducer {
+public class Sum extends RegExpMapReducer {
 
-	protected String field;
+	public static final String SUM = "sum_";
 
-	protected String sumField;
-
-	public Sum(String field, String sumField) {
-		this.field = field;
-		this.sumField = sumField;
+	public Sum(String regExp) {
+		super(SUM, regExp);
 	}
 
 	@Override
-	public void one(BSONObject gameplayResult, BSONObject result) {
+	public void one(String field, BSONObject gameplayResult, BSONObject result) {
 		Object value = gameplayResult.get(field);
-		result.put(sumField, value);
+		result.put(SUM + field, value);
 	}
 
 	@Override
-	public void aggregate(BSONObject v1, BSONObject v2, BSONObject result) {
-		Number value1 = (Number) v1.get(sumField);
-		Number value2 = (Number) v2.get(sumField);
+	public void aggregate(String field, BSONObject v1, BSONObject v2,
+			BSONObject result) {
+		Number value1 = (Number) v1.get(field);
+		Number value2 = (Number) v2.get(field);
 		boolean isLong = ((value1 instanceof Long) || (value1 instanceof Integer))
 				&& ((value2 instanceof Long) || (value2 instanceof Integer));
-		result.put(
-                sumField,
-				isLong ? value1.longValue() + value2.longValue() : value1
-						.doubleValue() + value2.doubleValue());
+		result.put(field, isLong ? value1.longValue() + value2.longValue()
+				: value1.doubleValue() + value2.doubleValue());
 	}
 }

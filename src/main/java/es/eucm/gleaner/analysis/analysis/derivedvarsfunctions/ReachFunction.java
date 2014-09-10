@@ -28,8 +28,7 @@ public class ReachFunction implements DerivedVarFunction {
 		ArrayList<TraceAnalyzer> traceAnalyzers = new ArrayList<TraceAnalyzer>();
 		for (List<Object> arguments : argumentsList) {
 			String zone = (String) arguments.get(0);
-			String varName = "_z_reached_" + zone;
-			traceAnalyzers.add(new ZoneReached(varName, zone));
+			traceAnalyzers.add(new ZoneReached(zone));
 		}
 		return traceAnalyzers;
 	}

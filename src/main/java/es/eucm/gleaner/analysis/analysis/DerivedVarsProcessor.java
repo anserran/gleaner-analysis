@@ -55,7 +55,10 @@ public class DerivedVarsProcessor implements Serializable {
 	public void addExpression(String varName, String varExpression) {
 		context.evaluateString(scope, varExpression.replace("||", "&&")
 				.replace("?", "&&").replace(":", "&&"), "<cmd>", 1, null);
-		derivedVars.add(new DerivedVar(varName, varExpression));
+		DerivedVar derivedVar = new DerivedVar(varName, varExpression);
+		if (!derivedVars.contains(derivedVar)) {
+			derivedVars.add(derivedVar);
+		}
 	}
 
 	/**
@@ -171,6 +174,23 @@ public class DerivedVarsProcessor implements Serializable {
 		private DerivedVar(String name, String expression) {
 			this.name = name;
 			this.expression = expression;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+
+			DerivedVar that = (DerivedVar) o;
+
+			return name.equals(that.name);
+		}
+
+		@Override
+		public int hashCode() {
+			return name.hashCode();
 		}
 	}
 

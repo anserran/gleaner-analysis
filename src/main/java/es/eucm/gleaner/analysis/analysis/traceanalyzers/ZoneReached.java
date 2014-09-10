@@ -6,30 +6,32 @@ import es.eucm.gleaner.analysis.Q;
 
 public class ZoneReached implements TraceAnalyzer {
 
-    private String resultVariable;
+	private String zoneToReach;
 
-    private String zoneToReach;
+	public ZoneReached(String zoneToReach) {
+		this.zoneToReach = zoneToReach;
+	}
 
-    public ZoneReached(String resultVariable, String zoneToReach){
-        this.resultVariable = resultVariable;
-        this.zoneToReach = zoneToReach;
-    }
+	@Override
+	public void defaultValues(BSONObject gameplayResult) {
+		gameplayResult.put(ZONE_REACHED_PREFIX + zoneToReach, false);
+	}
 
-    @Override
-    public void defaultValues(BSONObject gameplayResult) {
-        gameplayResult.put(resultVariable, false);
-    }
+	@Override
+	public boolean interestedIn(String event) {
+		return zoneToReach != null && ZONE.equals(event);
+	}
 
-    @Override
-    public boolean interestedIn(String event) {
-        return zoneToReach != null && ZONE.equals(event);
-    }
+	@Override
+	public void analyze(BSONObject trace, BSONObject gameplayResult) {
+		String zone = Q.get(VALUE, trace);
+		if (zoneToReach.equals(zone)) {
+			gameplayResult.put(ZONE_REACHED_PREFIX + zoneToReach, true);
+		}
+	}
 
-    @Override
-    public void analyze(BSONObject trace, BSONObject gameplayResult) {
-        String zone = Q.get(VALUE, trace);
-        if (zoneToReach.equals(zone)){
-            gameplayResult.put(resultVariable, true);
-        }
-    }
+	@Override
+	public String getVarsGenerated() {
+		return ZONE_REACHED_PREFIX + zoneToReach;
+	}
 }

@@ -1,5 +1,7 @@
 package es.eucm.gleaner.analysis.derivedvarsfunctions;
 
+import es.eucm.gleaner.analysis.GameplayResultAssert.ResultAsserter;
+import es.eucm.gleaner.analysis.Trace.ZoneTrace;
 import es.eucm.gleaner.analysis.VersionData;
 import org.bson.BSONObject;
 
@@ -16,6 +18,7 @@ public class ReachTest extends DerivedVarFunctionTest {
 		VersionData versionData = new VersionData();
 		versionData.putVar("started", "reach('start')");
 		versionData.putVar("finished", "reach('start') && reach('finish')");
+        versionData.forceCalculate("started", "finished");
 		return versionData;
 	}
 

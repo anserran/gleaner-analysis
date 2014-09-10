@@ -6,20 +6,22 @@ public class Mean extends Sum {
 
 	private String meanField;
 
-	public Mean(String field, String aggregatedField) {
-		super(field, aggregatedField + "_sum");
+	public Mean(String aggregatedField) {
+		super(aggregatedField + "_sum");
 		this.meanField = aggregatedField;
 	}
 
 	@Override
-	public void one(BSONObject gameplayResult, BSONObject result) {
+	public void one(String sumField, BSONObject gameplayResult,
+			BSONObject result) {
 		super.one(gameplayResult, result);
 		result.put(meanField, gameplayResult.get(sumField));
 		result.put(meanField + "_count", 1);
 	}
 
 	@Override
-	public void aggregate(BSONObject v1, BSONObject v2, BSONObject result) {
+	public void aggregate(String sumField, BSONObject v1, BSONObject v2,
+			BSONObject result) {
 		super.aggregate(v1, v2, result);
 		Number count1 = (Number) v1.get(meanField + "_count");
 		Number count2 = (Number) v2.get(meanField + "_count");

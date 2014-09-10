@@ -28,7 +28,7 @@ public class MsFunction implements DerivedVarFunction {
 		ArrayList<TraceAnalyzer> traceAnalyzers = new ArrayList<TraceAnalyzer>();
 		for (List<Object> arguments : argumentsList) {
 			String zone = (String) arguments.get(0);
-			traceAnalyzers.add(new ZoneTime("_z_ms_" + zone, zone));
+			traceAnalyzers.add(new ZoneTime(zone));
 		}
 		return traceAnalyzers;
 	}

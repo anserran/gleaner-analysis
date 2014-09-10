@@ -11,4 +11,8 @@ public class Q {
     public static <T> T getValue(BSONObject bsonObject){
         return get("value", bsonObject);
     }
+
+    public static <T> T getTarget(BSONObject bsonObject){
+        return get("target", bsonObject);
+    }
 }

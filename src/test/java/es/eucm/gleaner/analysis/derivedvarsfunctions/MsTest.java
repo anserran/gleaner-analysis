@@ -1,5 +1,7 @@
 package es.eucm.gleaner.analysis.derivedvarsfunctions;
 
+import es.eucm.gleaner.analysis.GameplayResultAssert.ResultAsserter;
+import es.eucm.gleaner.analysis.Trace.ZoneTrace;
 import es.eucm.gleaner.analysis.VersionData;
 import org.bson.BSONObject;
 
@@ -16,6 +18,7 @@ public class MsTest extends DerivedVarFunctionTest {
 		versionData.putVar("ms", "ms('start')");
 		versionData.putVar("seconds", "ms('start') / 1000");
         versionData.putVar("ms2", "ms('start') + ms('start')");
+        versionData.forceCalculate("ms", "seconds", "ms2");
 		return versionData;
 	}
 

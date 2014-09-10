@@ -1,11 +1,11 @@
-package es.eucm.gleaner.analysis.derivedvarsfunctions;
+package es.eucm.gleaner.analysis.test;
 
 import es.eucm.gleaner.analysis.GameplayResultAssert;
-import es.eucm.gleaner.analysis.GameplayResultAssert.ResultAsserter;
+import es.eucm.gleaner.analysis.GameplayResultAssert.SegmentAsserter;
 import es.eucm.gleaner.analysis.MockReport;
+import es.eucm.gleaner.analysis.GameplayResultAssert.ResultAsserter;
 import es.eucm.gleaner.analysis.Split;
 import es.eucm.gleaner.analysis.analysis.GameplaysAnalysis;
-import es.eucm.gleaner.analysis.functions.ExtractFieldAsKey;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -14,13 +14,15 @@ import org.junit.Test;
 
 import java.util.List;
 
-public abstract class DerivedVarFunctionTest {
+public abstract class AnalysisTest {
 
 	protected abstract BSONObject buildVersionData();
 
 	protected abstract List<BSONObject> buildTraces();
 
 	protected abstract ResultAsserter buildResultAsserter();
+
+	protected abstract SegmentAsserter buildSegmentAsserter();
 
 	@Test
 	public void test() {
@@ -32,10 +34,19 @@ public abstract class DerivedVarFunctionTest {
 		GameplaysAnalysis gameplaysAnalysis = new GameplaysAnalysis();
 		gameplaysAnalysis.getReportsMap().put("mock", new MockReport());
 		gameplaysAnalysis.read(versionData);
-		traces.mapToPair(new ExtractFieldAsKey("gameplayId")).groupByKey()
-				.mapToPair(gameplaysAnalysis.getTracesAnalyzer())
+		JavaPairRDD<Object, BSONObject> gameplaysResults = gameplaysAnalysis
+				.calculateGameplayResults(traces);
+
+		gameplaysResults
 				.foreach(new GameplayResultAssert(buildResultAsserter()));
 
-	}
+		BSONObject segmentResult = gameplaysAnalysis
+				.calculateSegmentResult(gameplaysResults);
 
+		SegmentAsserter segmentAsserter = buildSegmentAsserter();
+		if (segmentAsserter != null) {
+			segmentAsserter.assertSegment(segmentResult);
+		}
+
+	}
 }
