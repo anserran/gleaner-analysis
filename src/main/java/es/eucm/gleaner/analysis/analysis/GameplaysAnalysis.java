@@ -93,9 +93,11 @@ public class GameplaysAnalysis {
 	private String getDerivedVarExpression(BSONObject versionData,
 			String variableName) {
 		List<BSONObject> derivedVars = Q.get("derivedVars", versionData);
-		for (BSONObject derivedVar : derivedVars) {
-			if (variableName.equals(Q.get("name", derivedVar))) {
-				return Q.getValue(derivedVar);
+		if (derivedVars != null) {
+			for (BSONObject derivedVar : derivedVars) {
+				if (variableName.equals(Q.get("name", derivedVar))) {
+					return Q.getValue(derivedVar);
+				}
 			}
 		}
 		return null;
@@ -117,7 +119,7 @@ public class GameplaysAnalysis {
 	}
 
 	public DBObject calculateSegmentResult(
-            JavaPairRDD<Object, BSONObject> gameplaysResults) {
+			JavaPairRDD<Object, BSONObject> gameplaysResults) {
 		DBObject versionResult = new BasicDBObject(gameplaysResults
 				.map(getMapReducers()).reduce(getMapReducers()).toMap());
 		groupOperations(versionResult);

@@ -3,10 +3,10 @@ package es.eucm.gleaner.analysis.analysis;
 import es.eucm.gleaner.analysis.analysis.derivedvarsfunctions.DerivedVarFunction;
 import es.eucm.gleaner.analysis.analysis.traceanalyzers.TraceAnalyzer;
 import org.bson.BSONObject;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.ScriptableObject;
+import sun.org.mozilla.javascript.Context;
+import sun.org.mozilla.javascript.Function;
+import sun.org.mozilla.javascript.NativeArray;
+import sun.org.mozilla.javascript.ScriptableObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,35 +1,34 @@
 package es.eucm.gleaner.analysis.analysis.mappers;
 
 import es.eucm.gleaner.analysis.Q;
+import es.eucm.gleaner.analysis.ScriptEvaluator;
 import org.bson.BSONObject;
 
 public class Count implements MapReducer {
 
-    public static final String COUNT = "_count_";
+    private String variable;
 
-    private String field;
+    private String condition;
 
-    private Object value;
-
-    public Count(String field, Object value) {
-        this.field = field;
-        this.value = value;
+    public Count(String variable, String condition) {
+        this.variable = variable;
+        this.condition = condition;
     }
 
     @Override
     public void one(BSONObject gameplayResult, BSONObject result) {
-        Object resultValue = Q.get(field, gameplayResult);
-        if ( value == resultValue || value.equals(resultValue)){
-            result.put(COUNT + field + value, 1);
+        Object value = ScriptEvaluator.evaluateExpression(gameplayResult.toMap(), condition);
+        if ( Boolean.TRUE.equals(value)){
+            result.put(variable, 1);
         } else {
-            result.put(COUNT + field + value, 0);
+            result.put(variable, 0);
         }
     }
 
     @Override
     public void aggregate(BSONObject v1, BSONObject v2, BSONObject result) {
-        Number count1 = Q.get(COUNT + field + value, v1);
-        Number count2 = Q.get(COUNT + field + value, v2);
-        result.put(COUNT + field + value, count1.intValue() + count2.intValue());
+        Number count1 = Q.get(variable, v1);
+        Number count2 = Q.get(variable, v2);
+        result.put(variable, count1.intValue() + count2.intValue());
     }
 }

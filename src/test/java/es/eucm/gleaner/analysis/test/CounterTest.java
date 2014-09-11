@@ -5,7 +5,6 @@ import es.eucm.gleaner.analysis.GameplayResultAssert.SegmentAsserter;
 import es.eucm.gleaner.analysis.Q;
 import es.eucm.gleaner.analysis.Trace.ZoneTrace;
 import es.eucm.gleaner.analysis.VersionData;
-import es.eucm.gleaner.analysis.analysis.mappers.Count;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
@@ -24,17 +23,16 @@ public class CounterTest extends AnalysisTest {
 	protected BSONObject buildVersionData() {
 		VersionData versionData = new VersionData();
 		versionData.putVar("completed", "reach('Result')");
-        versionData.putVar("all", "true");
 
 		BasicBSONObject counter = new BasicBSONObject();
-		counter.put("variable", "completed");
-		counter.put("value", true);
+		counter.put("counterVariable", "count_completed");
+		counter.put("condition", "completed === true");
 
 		versionData.addReport("counter", counter);
 
         BasicBSONObject counter2 = new BasicBSONObject();
-        counter2.put("variable", "all");
-        counter2.put("value", true);
+        counter2.put("counterVariable", "count_all");
+        counter2.put("condition", "true");
 
         versionData.addReport("counter", counter);
         versionData.addReport("counter", counter2);
@@ -70,13 +68,12 @@ public class CounterTest extends AnalysisTest {
 			} else {
 				assertFalse(value);
 			}
-            assertTrue(Q.<Boolean>get("all", gameplayResult));
 		}
 
 		@Override
 		public void assertSegment(BSONObject segmentResult) {
-            assertEquals(Q.get(Count.COUNT + "completedtrue", segmentResult), 2);
-            assertEquals(Q.get(Count.COUNT + "alltrue", segmentResult), 4);
+            assertEquals(Q.get("count_completed", segmentResult), 2);
+            assertEquals(Q.get("count_all", segmentResult), 4);
 		}
 	}
 
