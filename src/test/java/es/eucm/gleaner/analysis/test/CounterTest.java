@@ -8,6 +8,7 @@ import es.eucm.gleaner.analysis.VersionData;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class CounterTest extends AnalysisTest {
 
         versionData.addReport("counter", counter);
         versionData.addReport("counter", counter2);
+
+        versionData.addSegment("winners", "completed === true");
 		return versionData;
 	}
 
@@ -60,7 +63,14 @@ public class CounterTest extends AnalysisTest {
 	public static class CounterAsserter implements ResultAsserter,
 			SegmentAsserter {
 
-		@Override
+        private ArrayList<String> segmentsExpected = new ArrayList<String>();
+
+        public CounterAsserter() {
+            segmentsExpected.add("all");
+            segmentsExpected.add("winners");
+        }
+
+        @Override
 		public void assertResult(String gameplayId, BSONObject gameplayResult) {
 			Boolean value = Q.get("completed", gameplayResult);
 			if ("1".equals(gameplayId) || "4".equals(gameplayId)) {
@@ -71,10 +81,20 @@ public class CounterTest extends AnalysisTest {
 		}
 
 		@Override
-		public void assertSegment(BSONObject segmentResult) {
-            assertEquals(Q.get("count_completed", segmentResult), 2);
-            assertEquals(Q.get("count_all", segmentResult), 4);
+		public void assertSegment(String segmentName, BSONObject segmentResult) {
+            if ("all".equals(segmentName)) {
+                assertEquals(Q.get("count_completed", segmentResult), 2);
+                assertEquals(Q.get("count_all", segmentResult), 4);
+            } else if ("winners".equals(segmentName)) {
+                assertEquals(Q.get("count_completed", segmentResult), 2);
+                assertEquals(Q.get("count_all", segmentResult), 2);
+            }
+            assertTrue(segmentsExpected.remove(segmentName));
 		}
 	}
 
+    @Override
+    protected void extraTest() {
+        assertTrue(asserter.segmentsExpected.isEmpty());
+    }
 }

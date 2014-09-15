@@ -48,21 +48,18 @@ public class Main {
 		JavaPairRDD<Object, BSONObject> gameplaysResults = gameplaysAnalysis
 				.calculateGameplayResults(traces);
 
-		DBObject versionResult = gameplaysAnalysis
-				.calculateSegmentResult(gameplaysResults);
+        // Write to mongo gameplays
+        db.getCollection("gameplaysresults_" + versionId).drop();
 
-		versionResult.put("versionId", new ObjectId(versionId));
-		BasicDBObject update = new BasicDBObject("versionId", new ObjectId(
-				versionId));
-		db.getCollection("versionsresults").update(update, versionResult, true,
-				false);
+        config.set("mongo.output.uri", "mongodb://" + mongoHost + ":"
+                + mongoPort + "/" + mongoDB + ".gameplaysresults_" + versionId);
+        gameplaysResults.saveAsNewAPIHadoopFile("file:///bogus", Object.class,
+                Object.class, MongoOutputFormat.class, config);
 
-		// Write to mongo
-		db.getCollection("gameplaysresults_" + versionId).drop();
-
-		config.set("mongo.output.uri", "mongodb://" + mongoHost + ":"
-				+ mongoPort + "/" + mongoDB + ".gameplaysresults_" + versionId);
-		gameplaysResults.saveAsNewAPIHadoopFile("file:///bogus", Object.class,
-				Object.class, MongoOutputFormat.class, config);
+        ArrayList<DBObject> segmentResults = gameplaysAnalysis
+				.calculateSegments(gameplaysResults, versionData);
+        // Write to mongo segment results
+        db.getCollection("segments_" + versionId).drop();
+        db.getCollection("segments_" + versionId).insert(segmentResults);
 	}
 }

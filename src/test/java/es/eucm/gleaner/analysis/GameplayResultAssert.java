@@ -33,6 +33,6 @@ public class GameplayResultAssert implements
 	}
 
 	public static interface SegmentAsserter extends Serializable {
-		void assertSegment(BSONObject segmentResult);
+		void assertSegment(String segmentName, BSONObject segmentResult);
 	}
 }

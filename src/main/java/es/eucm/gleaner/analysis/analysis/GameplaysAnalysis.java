@@ -10,6 +10,7 @@ import es.eucm.gleaner.analysis.analysis.groupoperations.GroupOperation;
 import es.eucm.gleaner.analysis.analysis.reports.CounterReport;
 import es.eucm.gleaner.analysis.analysis.reports.Report;
 import es.eucm.gleaner.analysis.functions.ExtractFieldAsKey;
+import es.eucm.gleaner.analysis.functions.SegmentFilter;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.bson.BSONObject;
 
@@ -118,11 +119,31 @@ public class GameplaysAnalysis {
 		return gameplays.mapToPair(getTracesAnalyzer());
 	}
 
-	public DBObject calculateSegmentResult(
-			JavaPairRDD<Object, BSONObject> gameplaysResults) {
-		DBObject versionResult = new BasicDBObject(gameplaysResults
+	public ArrayList<DBObject> calculateSegments(
+			JavaPairRDD<Object, BSONObject> gameplaysResults,
+			BSONObject versionData) {
+
+		ArrayList<DBObject> segmentsResults = new ArrayList<DBObject>();
+
+		DBObject allResults = new BasicDBObject(gameplaysResults
 				.map(getMapReducers()).reduce(getMapReducers()).toMap());
-		groupOperations(versionResult);
-		return versionResult;
+		groupOperations(allResults);
+		allResults.put("segmentName", "all");
+		segmentsResults.add(allResults);
+
+		List<BSONObject> segments = Q.get("segments", versionData);
+		if (segments != null) {
+			for (BSONObject segment : segments) {
+				JavaPairRDD<Object, BSONObject> segmentedGameplays = gameplaysResults
+						.filter(new SegmentFilter(Q.<String> get("condition",
+								segment)));
+				DBObject segmentResults = new BasicDBObject(segmentedGameplays
+						.map(getMapReducers()).reduce(getMapReducers()).toMap());
+				groupOperations(segmentResults);
+				segmentResults.put("segmentName", Q.get("name", segment));
+				segmentsResults.add(segmentResults);
+			}
+		}
+		return segmentsResults;
 	}
 }

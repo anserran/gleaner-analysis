@@ -2,6 +2,7 @@ package es.eucm.gleaner.analysis;
 
 import com.mongodb.BasicDBObject;
 import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ public class VersionData extends BasicDBObject {
 
 	private List<BSONObject> reports;
 
+    private List<BSONObject> segments;
+
 	public VersionData() {
 		put("derivedVars", derivedVars = new ArrayList<BSONObject>());
 
@@ -20,6 +23,8 @@ public class VersionData extends BasicDBObject {
 		ArrayList<BasicDBObject> panels = new ArrayList<BasicDBObject>();
 		panels.add(panel);
 		put("panels", panels);
+
+        put("segments", segments = new ArrayList<BSONObject>());
 	}
 
 	public void putVar(String name, String expression) {
@@ -37,5 +42,11 @@ public class VersionData extends BasicDBObject {
     public void addReport(String type, BSONObject data){
         data.put("type", type);
         reports.add(data);
+    }
+
+    public void addSegment(String name, String condition) {
+        BasicBSONObject segment = new BasicBSONObject("name", name);
+        segment.put("condition", condition);
+        segments.add(segment);
     }
 }

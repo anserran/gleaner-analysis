@@ -1,9 +1,11 @@
 package es.eucm.gleaner.analysis.test;
 
+import com.mongodb.DBObject;
 import es.eucm.gleaner.analysis.GameplayResultAssert;
+import es.eucm.gleaner.analysis.GameplayResultAssert.ResultAsserter;
 import es.eucm.gleaner.analysis.GameplayResultAssert.SegmentAsserter;
 import es.eucm.gleaner.analysis.MockReport;
-import es.eucm.gleaner.analysis.GameplayResultAssert.ResultAsserter;
+import es.eucm.gleaner.analysis.Q;
 import es.eucm.gleaner.analysis.Split;
 import es.eucm.gleaner.analysis.analysis.GameplaysAnalysis;
 import org.apache.spark.SparkConf;
@@ -12,6 +14,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.bson.BSONObject;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AnalysisTest {
@@ -23,6 +26,10 @@ public abstract class AnalysisTest {
 	protected abstract ResultAsserter buildResultAsserter();
 
 	protected abstract SegmentAsserter buildSegmentAsserter();
+
+    protected void extraTest(){
+
+    }
 
 	@Test
 	public void test() {
@@ -40,13 +47,17 @@ public abstract class AnalysisTest {
 		gameplaysResults
 				.foreach(new GameplayResultAssert(buildResultAsserter()));
 
-		BSONObject segmentResult = gameplaysAnalysis
-				.calculateSegmentResult(gameplaysResults);
+		ArrayList<DBObject> segmentsResults = gameplaysAnalysis
+				.calculateSegments(gameplaysResults, versionData);
 
 		SegmentAsserter segmentAsserter = buildSegmentAsserter();
 		if (segmentAsserter != null) {
-			segmentAsserter.assertSegment(segmentResult);
+			for (DBObject segmentResult : segmentsResults) {
+				segmentAsserter.assertSegment(
+						Q.<String> get("segmentName", segmentResult),
+						segmentResult);
+			}
 		}
-
+        extraTest();
 	}
 }
