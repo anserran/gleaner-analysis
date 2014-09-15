@@ -44,9 +44,19 @@ public class VersionData extends BasicDBObject {
         reports.add(data);
     }
 
-    public void addSegment(String name, String condition) {
+    public BasicBSONObject addSegment(String name, String condition) {
         BasicBSONObject segment = new BasicBSONObject("name", name);
         segment.put("condition", condition);
         segments.add(segment);
+        return segment;
+    }
+
+    public BasicBSONObject addSegment(String name, String condition, String operator, String operation) {
+        BasicBSONObject segment = addSegment(name, condition);
+        BasicBSONObject groupby = new BasicBSONObject("operator", operator);
+        groupby.put("operator", operator);
+        segment.put("operation", operation);
+        segment.put("groupbyplayer", groupby);
+        return segment;
     }
 }

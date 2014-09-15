@@ -10,6 +10,7 @@ import es.eucm.gleaner.analysis.analysis.groupoperations.GroupOperation;
 import es.eucm.gleaner.analysis.analysis.reports.CounterReport;
 import es.eucm.gleaner.analysis.analysis.reports.Report;
 import es.eucm.gleaner.analysis.functions.ExtractFieldAsKey;
+import es.eucm.gleaner.analysis.functions.MetCondition;
 import es.eucm.gleaner.analysis.functions.SegmentFilter;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.bson.BSONObject;
@@ -137,6 +138,17 @@ public class GameplaysAnalysis {
 				JavaPairRDD<Object, BSONObject> segmentedGameplays = gameplaysResults
 						.filter(new SegmentFilter(Q.<String> get("condition",
 								segment)));
+
+				if (segment.containsField("groupbyplayer")) {
+					BSONObject groupby = Q.get("groupbyplayer", segment);
+					String operator = Q.get("operator", groupby);
+					String operation = Q.get("operation", groupby);
+					segmentedGameplays = segmentedGameplays.groupByKey()
+							.flatMapToPair(
+									new MetCondition("first".equals(operator),
+											operation));
+				}
+
 				DBObject segmentResults = new BasicDBObject(segmentedGameplays
 						.map(getMapReducers()).reduce(getMapReducers()).toMap());
 				groupOperations(segmentResults);
