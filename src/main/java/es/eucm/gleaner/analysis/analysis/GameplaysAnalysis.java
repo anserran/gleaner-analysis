@@ -120,13 +120,22 @@ public class GameplaysAnalysis {
 		return gameplays.mapToPair(getTracesAnalyzer());
 	}
 
+	/**
+	 * Calculate segment results
+	 * 
+	 * @param gameplayResults
+	 *            as key, the player id, as value, a gameplay result
+	 * @param versionData
+	 *            version data containing segments data
+	 * @return a list with the segments results
+	 */
 	public ArrayList<DBObject> calculateSegments(
-			JavaPairRDD<Object, BSONObject> gameplaysResults,
+			JavaPairRDD<Object, BSONObject> gameplayResults,
 			BSONObject versionData) {
 
 		ArrayList<DBObject> segmentsResults = new ArrayList<DBObject>();
 
-		DBObject allResults = new BasicDBObject(gameplaysResults
+		DBObject allResults = new BasicDBObject(gameplayResults
 				.map(getMapReducers()).reduce(getMapReducers()).toMap());
 		groupOperations(allResults);
 		allResults.put("segmentName", "all");
@@ -135,7 +144,7 @@ public class GameplaysAnalysis {
 		List<BSONObject> segments = Q.get("segments", versionData);
 		if (segments != null) {
 			for (BSONObject segment : segments) {
-				JavaPairRDD<Object, BSONObject> segmentedGameplays = gameplaysResults
+				JavaPairRDD<Object, BSONObject> segmentedGameplays = gameplayResults
 						.filter(new SegmentFilter(Q.<String> get("condition",
 								segment)));
 
@@ -149,11 +158,14 @@ public class GameplaysAnalysis {
 											operation));
 				}
 
-				DBObject segmentResults = new BasicDBObject(segmentedGameplays
-						.map(getMapReducers()).reduce(getMapReducers()).toMap());
-				groupOperations(segmentResults);
-				segmentResults.put("segmentName", Q.get("name", segment));
-				segmentsResults.add(segmentResults);
+				if (segmentedGameplays.count() > 0) {
+					DBObject segmentResults = new BasicDBObject(
+							segmentedGameplays.map(getMapReducers())
+									.reduce(getMapReducers()).toMap());
+					groupOperations(segmentResults);
+					segmentResults.put("segmentName", Q.get("name", segment));
+					segmentsResults.add(segmentResults);
+				}
 			}
 		}
 		return segmentsResults;

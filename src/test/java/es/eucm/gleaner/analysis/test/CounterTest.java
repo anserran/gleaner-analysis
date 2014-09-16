@@ -60,7 +60,12 @@ public class CounterTest extends AnalysisTest {
 		return asserter;
 	}
 
-	public static class CounterAsserter implements ResultAsserter,
+    @Override
+    protected PlayerSetter buildPlayerSetter() {
+        return null;
+    }
+
+    public static class CounterAsserter implements ResultAsserter,
 			SegmentAsserter {
 
         private ArrayList<String> segmentsExpected = new ArrayList<String>();

@@ -55,7 +55,7 @@ public class VersionData extends BasicDBObject {
         BasicBSONObject segment = addSegment(name, condition);
         BasicBSONObject groupby = new BasicBSONObject("operator", operator);
         groupby.put("operator", operator);
-        segment.put("operation", operation);
+        groupby.put("operation", operation);
         segment.put("groupbyplayer", groupby);
         return segment;
     }

@@ -11,8 +11,10 @@ import es.eucm.gleaner.analysis.analysis.GameplaysAnalysis;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
 import org.bson.BSONObject;
 import org.junit.Test;
+import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +29,15 @@ public abstract class AnalysisTest {
 
 	protected abstract SegmentAsserter buildSegmentAsserter();
 
-    protected void extraTest(){
+	protected abstract PlayerSetter buildPlayerSetter();
 
-    }
+	protected void addExtra(GameplaysAnalysis gameplaysAnalysis) {
+
+	}
+
+	protected void extraTest() {
+
+	}
 
 	@Test
 	public void test() {
@@ -41,8 +49,10 @@ public abstract class AnalysisTest {
 		GameplaysAnalysis gameplaysAnalysis = new GameplaysAnalysis();
 		gameplaysAnalysis.getReportsMap().put("mock", new MockReport());
 		gameplaysAnalysis.read(versionData);
+		addExtra(gameplaysAnalysis);
 		JavaPairRDD<Object, BSONObject> gameplaysResults = gameplaysAnalysis
-				.calculateGameplayResults(traces);
+				.calculateGameplayResults(traces).mapToPair(
+						new PlayerSetterFunction(buildPlayerSetter()));
 
 		gameplaysResults
 				.foreach(new GameplayResultAssert(buildResultAsserter()));
@@ -58,6 +68,31 @@ public abstract class AnalysisTest {
 						segmentResult);
 			}
 		}
-        extraTest();
+		extraTest();
+	}
+
+	public static class PlayerSetterFunction implements
+			PairFunction<Tuple2<Object, BSONObject>, Object, BSONObject> {
+
+		private PlayerSetter playerSetter;
+
+		public PlayerSetterFunction(PlayerSetter playerSetter) {
+			this.playerSetter = playerSetter;
+		}
+
+		@Override
+		public Tuple2<Object, BSONObject> call(Tuple2<Object, BSONObject> tuple2) {
+			if (playerSetter == null) {
+				return new Tuple2<Object, BSONObject>("player", tuple2._2);
+			} else {
+				return new Tuple2<Object, BSONObject>(
+						playerSetter.getPlayer((String) tuple2._2
+								.get("gameplayId")), tuple2._2);
+			}
+		}
+	}
+
+	public static interface PlayerSetter {
+		String getPlayer(String gameplayId);
 	}
 }

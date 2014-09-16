@@ -27,7 +27,7 @@ public abstract class RegExpMapReducer implements MapReducer {
 		for (String field : v1.keySet()) {
 			if (field.equals(prefix + regExp)
 					|| field.matches("^" + prefix + regExp + "$")) {
-				aggregate(prefix + field, v1, v2, result);
+				aggregate(field, v1, v2, result);
 			}
 		}
 	}
