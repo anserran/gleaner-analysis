@@ -8,10 +8,15 @@ import java.util.List;
 
 public interface Report {
 
-    void readReportData(BSONObject reportData);
-    
-    List<String> addTracesAnalyzers(TracesAnalyzer tracesAnalyzer);
+	/**
+	 * Reads data for the report.
+	 * 
+	 * @return if the data is valid to build the report
+	 */
+	boolean readReportData(BSONObject reportData);
 
-    void addMapReducers(MapReducers mapReducers);
+	List<String> addTracesAnalyzers(TracesAnalyzer tracesAnalyzer);
+
+	void addMapReducers(MapReducers mapReducers);
 
 }

@@ -10,8 +10,8 @@ import java.util.List;
 public class ZonesTreeMapReport implements Report {
 
     @Override
-    public void readReportData(BSONObject reportData) {
-
+    public boolean readReportData(BSONObject reportData) {
+        return false;
     }
 
     @Override

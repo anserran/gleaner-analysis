@@ -16,8 +16,9 @@ public class MockReport implements Report {
 	}
 
 	@Override
-	public void readReportData(BSONObject reportData) {
+	public boolean readReportData(BSONObject reportData) {
         this.derivedVars = Q.get("vars", reportData);
+        return true;
 	}
 
 	@Override

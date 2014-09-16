@@ -18,9 +18,10 @@ public class CounterReport implements Report {
 	private String counterVariable;
 
 	@Override
-	public void readReportData(BSONObject reportData) {
+	public boolean readReportData(BSONObject reportData) {
 		this.condition = Q.get("condition", reportData);
 		this.counterVariable = Q.get("counterVariable", reportData);
+        return condition != null && counterVariable != null;
 	}
 
 	@Override

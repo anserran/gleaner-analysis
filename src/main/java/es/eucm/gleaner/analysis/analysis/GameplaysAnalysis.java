@@ -50,8 +50,7 @@ public class GameplaysAnalysis {
 					for (BSONObject reportData : reports) {
 						Report report = reportsMap.get(Q
 								.get("type", reportData));
-						if (report != null) {
-							report.readReportData(reportData);
+						if (report != null && report.readReportData(reportData)) {
 							List<String> vars = report
 									.addTracesAnalyzers(tracesAnalyzer);
 							for (String var : vars) {
