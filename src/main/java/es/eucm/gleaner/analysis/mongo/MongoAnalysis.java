@@ -42,6 +42,10 @@ public class MongoAnalysis extends Analysis {
 	}
 
 	public void execute(SparkConf conf) {
+		execute(conf, false);
+	}
+
+	public void execute(SparkConf conf, boolean force) {
 		try {
 			db = new Mongo(mongoHost, mongoPort).getDB(mongoDB);
 		} catch (UnknownHostException e) {
@@ -55,7 +59,7 @@ public class MongoAnalysis extends Analysis {
 		Object loading = versionData.containsField("analyzing") ? versionData
 				.get("analyzing") : Boolean.FALSE;
 
-		if (loading instanceof Boolean && !(Boolean) loading) {
+		if (force || (loading instanceof Boolean && !(Boolean) loading)) {
 			setVersionLoading(true);
 			try {
 				if (sc == null) {
@@ -90,7 +94,7 @@ public class MongoAnalysis extends Analysis {
 						.foreach(new Update(mongoHost, mongoPort, mongoDB,
 								"gameplaysresults_" + versionId, "gameplayId"));
 
-				// Read players
+				// Read gameplays
 				config.set("mongo.input.uri", "mongodb://" + mongoHost + ":"
 						+ mongoPort + "/" + mongoDB + ".gameplays_" + versionId);
 

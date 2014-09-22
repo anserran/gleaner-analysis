@@ -101,16 +101,18 @@ public class DataAnalysisExtractor {
 	}
 
 	private void processSegments(List<BSONObject> dataSegments) {
-		for (BSONObject segment : dataSegments) {
-			String name = Q.get("name", segment);
-			String expression = Q.get("condition", segment);
-			String having = Q.get("having", segment);
-			if (addVariable("_segment_" + name, expression)
-					|| segmentOperationChanged(name, having)) {
-				segments.put(name, having);
-				calculatedSegments.put(name, having);
-			}
-		}
+        if (dataSegments != null) {
+            for (BSONObject segment : dataSegments) {
+                String name = Q.get("name", segment);
+                String expression = Q.get("condition", segment);
+                String having = Q.get("having", segment);
+                if (addVariable("_segment_" + name, expression)
+                        || segmentOperationChanged(name, having)) {
+                    segments.put(name, having);
+                    calculatedSegments.put(name, having);
+                }
+            }
+        }
 	}
 
 	private boolean addVariable(String variableName, String expression) {

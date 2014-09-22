@@ -43,6 +43,5 @@ public class Update implements VoidFunction<Tuple2<Object, BSONObject>> {
 				new BasicDBObject(fieldKey, Q.get(fieldKey, dbObject)),
 				new BasicDBObject("$set", new BasicDBObject(dbObject.toMap())),
 				true, false);
-		collection.getDB().getMongo().close();
 	}
 }
