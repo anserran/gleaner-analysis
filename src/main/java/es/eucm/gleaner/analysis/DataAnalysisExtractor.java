@@ -1,5 +1,6 @@
 package es.eucm.gleaner.analysis;
 
+import es.eucm.gleaner.analysis.reports.ChoicesFrequency;
 import es.eucm.gleaner.analysis.reports.Counter;
 import es.eucm.gleaner.analysis.reports.Report;
 import es.eucm.gleaner.analysis.utils.Q;
@@ -45,6 +46,7 @@ public class DataAnalysisExtractor {
 		reportsMap = new HashMap<String, Report>();
 
 		reportsMap.put("counter", new Counter());
+		reportsMap.put("choices", new ChoicesFrequency());
 	}
 
 	public BSONObject extract(BSONObject versionData, BSONObject calculatedData) {
@@ -64,7 +66,8 @@ public class DataAnalysisExtractor {
 		analysisData.put("segments", segments = new BasicBSONObject());
 
 		processDerivedVars(Q.<List<BSONObject>> get("derivedVars", versionData));
-		processPanels(Q.<List<BSONObject>> get("panels", versionData));
+		processPanels(Q.<List<BSONObject>> get("panels", versionData),
+				versionData);
 		processSegments(Q.<List<BSONObject>> get("segments", versionData));
 		return analysisData;
 	}
@@ -77,14 +80,15 @@ public class DataAnalysisExtractor {
 		}
 	}
 
-	private void processPanels(List<BSONObject> panels) {
+	private void processPanels(List<BSONObject> panels, BSONObject versionData) {
 		for (BSONObject panel : panels) {
 			for (BSONObject report : Q.<List<BSONObject>> get("reports", panel)) {
 				String id = Q.get("id", report);
 				String type = Q.get("type", report);
 
 				Report reportBuilder = reportsMap.get(type);
-				if (reportBuilder != null && reportBuilder.readData(id, report)) {
+				if (reportBuilder != null
+						&& reportBuilder.readData(id, report, versionData)) {
 					BSONObject reducer = reportBuilder.getReducer();
 					List<Tuple2<String, String>> variables = reportBuilder
 							.getVariables();
@@ -101,18 +105,18 @@ public class DataAnalysisExtractor {
 	}
 
 	private void processSegments(List<BSONObject> dataSegments) {
-        if (dataSegments != null) {
-            for (BSONObject segment : dataSegments) {
-                String name = Q.get("name", segment);
-                String expression = Q.get("condition", segment);
-                String having = Q.get("having", segment);
-                if (addVariable("_segment_" + name, expression)
-                        || segmentOperationChanged(name, having)) {
-                    segments.put(name, having);
-                    calculatedSegments.put(name, having);
-                }
-            }
-        }
+		if (dataSegments != null) {
+			for (BSONObject segment : dataSegments) {
+				String name = Q.get("name", segment);
+				String expression = Q.get("condition", segment);
+				String having = Q.get("having", segment);
+				if (addVariable("_segment_" + name, expression)
+						|| segmentOperationChanged(name, having)) {
+					segments.put(name, having);
+					calculatedSegments.put(name, having);
+				}
+			}
+		}
 	}
 
 	private boolean addVariable(String variableName, String expression) {

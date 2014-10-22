@@ -12,7 +12,7 @@ public interface Report {
 	 *
 	 * @return if the data is valid to build the report
 	 */
-	boolean readData(String id, BSONObject report);
+	boolean readData(String id, BSONObject report, BSONObject versionData);
 
 	List<Tuple2<String, String>> getVariables();
 
