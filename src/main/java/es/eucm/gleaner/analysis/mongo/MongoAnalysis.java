@@ -107,6 +107,19 @@ public class MongoAnalysis extends Analysis {
 						.join(gameplays.mapToPair(new ExtractFieldAsKey("_id")))
 						.mapToPair(new MatchPlayer());
 
+				// Players
+				config.set("mongo.input.uri", "mongodb://" + mongoHost + ":"
+						+ mongoPort + "/" + mongoDB + ".players");
+
+				JavaPairRDD<Object, BSONObject> players = sc.newAPIHadoopRDD(
+						config, MongoInputFormat.class, Object.class,
+						BSONObject.class);
+
+				gameplaysResults = players
+						.mapToPair(new ExtractFieldAsKey("_id"))
+						.join(gameplaysResults.mapToPair(new ExtractFieldAsKey(
+								"playerId"))).mapToPair(new AddPlayerData());
+
 				List<BSONObject> segmentResults = analysis
 						.analyzeSegments(gameplaysResults);
 				// Write to mongo segment results
