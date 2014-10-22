@@ -24,6 +24,24 @@ public class Q {
 		}
 	}
 
+	public static <T> T getOrSet(String key, BSONObject bsonObject,
+			Class<T> clazz) {
+		T value = get(key, bsonObject);
+		if (value == null) {
+			T defaultValue;
+			try {
+				defaultValue = clazz.newInstance();
+				bsonObject.put(key, defaultValue);
+				return defaultValue;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return value;
+		}
+	}
+
 	public static <T> T getValue(BSONObject bsonObject) {
 		return get("value", bsonObject);
 	}
@@ -36,6 +54,14 @@ public class Q {
 		Object o = Q.get(key, bsonObject);
 		if (o instanceof Number) {
 			return ((Number) o).longValue();
+		}
+		return 0;
+	}
+
+	public static int getInt(String key, BSONObject bsonObject) {
+		Object o = Q.get(key, bsonObject);
+		if (o instanceof Number) {
+			return ((Number) o).intValue();
 		}
 		return 0;
 	}
@@ -75,4 +101,5 @@ public class Q {
 			return null;
 		}
 	}
+
 }
