@@ -2,6 +2,7 @@ package es.eucm.gleaner.analysis;
 
 import es.eucm.gleaner.analysis.traces.DoubleValue;
 import es.eucm.gleaner.analysis.traces.FunctionEvaluator;
+import es.eucm.gleaner.analysis.traces.SelectedOptions;
 import es.eucm.gleaner.analysis.traces.ZoneReached;
 import es.eucm.gleaner.analysis.traces.ZoneTime;
 import es.eucm.gleaner.analysis.utils.Q;
@@ -97,5 +98,10 @@ public class VariablesSetter implements
 	public double doubleValue(List<Object> arguments) {
 		return Q.getDouble(DoubleValue.PREFIX + arguments.get(0),
 				gameplayResult);
+	}
+
+	@Override
+	public Object choices(List<Object> arguments) {
+		return Q.get(SelectedOptions.PREFIX + arguments.get(0), gameplayResult);
 	}
 }

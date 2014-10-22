@@ -1,6 +1,7 @@
 package es.eucm.gleaner.analysis;
 
 import com.mongodb.BasicDBObject;
+import es.eucm.gleaner.analysis.traces.SelectedOptions;
 import es.eucm.gleaner.analysis.traces.DoubleValue;
 import es.eucm.gleaner.analysis.traces.FunctionEvaluator;
 import es.eucm.gleaner.analysis.traces.TraceAnalyzer;
@@ -16,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TracesAnalyzer implements
-		PairFunction<Tuple2<String, Iterable<BSONObject>>, Object, BSONObject>, FunctionEvaluator {
-
+		PairFunction<Tuple2<String, Iterable<BSONObject>>, Object, BSONObject>,
+		FunctionEvaluator {
 
 	private ArrayList<TraceAnalyzer> traceAnalyzers = new ArrayList<TraceAnalyzer>();
 
@@ -48,17 +49,28 @@ public class TracesAnalyzer implements
 
 	public long ms(List<Object> arguments) {
 		traceAnalyzers.add(new ZoneTime((String) arguments.get(0)));
-        return 0;
+		return 0;
 	}
 
 	public boolean reach(List<Object> arguments) {
 		traceAnalyzers.add(new ZoneReached((String) arguments.get(0)));
-        return false;
+		return false;
 	}
 
 	public double doubleValue(List<Object> arguments) {
 		traceAnalyzers.add(new DoubleValue((String) arguments.get(0)));
-        return 0;
+		return 0;
+	}
+
+	@Override
+	public Object choices(List arguments) {
+		String id = (String) arguments.get(0);
+		ArrayList<String> choiceIds = new ArrayList<String>();
+		for (int i = 1; i < arguments.size(); i++) {
+			choiceIds.add((String) arguments.get(i));
+		}
+		traceAnalyzers.add(new SelectedOptions(id, choiceIds));
+		return null;
 	}
 
 	@Override
