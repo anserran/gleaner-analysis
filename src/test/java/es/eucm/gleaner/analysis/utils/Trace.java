@@ -34,4 +34,15 @@ public class Trace extends BasicDBObject {
 			put("value", value);
 		}
 	}
+
+	public static class ChoiceTrace extends Trace {
+
+		public ChoiceTrace(Object gameplayId, String choiceId,
+				String selectedOption) {
+			super(gameplayId);
+			put("event", "choice");
+			put("target", choiceId);
+			put("value", selectedOption);
+		}
+	}
 }

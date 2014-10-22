@@ -1,10 +1,11 @@
 package es.eucm.gleaner.analysis.utils;
 
 import com.mongodb.BasicDBObject;
-import es.eucm.gleaner.analysis.utils.Q;
 import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class VersionData extends BasicDBObject {
@@ -14,6 +15,8 @@ public class VersionData extends BasicDBObject {
 	private List<BSONObject> reports;
 
 	private List<BSONObject> segments;
+
+	private List<BSONObject> choices;
 
 	public VersionData() {
 		put("derivedVars", derivedVars = new ArrayList<BSONObject>());
@@ -41,6 +44,15 @@ public class VersionData extends BasicDBObject {
 			derivedVars.add(var);
 		}
 		var.put("value", expression);
+	}
+
+	public void addChoice(String choiceId, String... options) {
+		if (choices == null) {
+			put("choices", choices = new ArrayList<BSONObject>());
+		}
+		BSONObject choice = new BasicBSONObject("id", choiceId);
+		choice.put("options", Arrays.asList(options));
+		choices.add(choice);
 	}
 
 	public void addReport(String type, BSONObject data) {
