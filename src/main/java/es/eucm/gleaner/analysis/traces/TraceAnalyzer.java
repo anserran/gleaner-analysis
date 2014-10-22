@@ -16,6 +16,7 @@ public interface TraceAnalyzer extends Serializable {
 
 	public static final String ZONE = "zone";
     public static final String VAR = "var";
+    public static final String CHOICE = "choice";
 
 	/**
 	 * Sets in the given result the default values of the calculated variables

@@ -1,5 +1,6 @@
 package es.eucm.gleaner.analysis;
 
+import es.eucm.gleaner.analysis.reducers.Aggregate2;
 import es.eucm.gleaner.analysis.reducers.Reducer;
 import es.eucm.gleaner.analysis.reducers.Sum;
 import es.eucm.gleaner.analysis.utils.Q;
@@ -22,8 +23,10 @@ public class Reducers implements
 		for (String var : dataReducers.keySet()) {
 			BSONObject reducer = Q.get(var, dataReducers);
 			String type = Q.get("type", reducer);
-			if ("sum".equals(type)) {
+			if (Sum.ID.equals(type)) {
 				this.reducers.add(new Sum(var));
+			} else if (Aggregate2.ID.equals(type)) {
+				this.reducers.add(new Aggregate2(var));
 			}
 		}
 	}

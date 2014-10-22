@@ -1,5 +1,6 @@
 package es.eucm.gleaner.analysis.reports;
 
+import es.eucm.gleaner.analysis.reducers.Sum;
 import es.eucm.gleaner.analysis.utils.Q;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
@@ -15,7 +16,7 @@ public class Counter implements Report {
 	private String condition;
 
 	@Override
-	public boolean readData(String id, BSONObject report) {
+	public boolean readData(String id, BSONObject report, BSONObject versionData) {
 		this.id = id;
 		this.condition = Q.get("condition", report);
 		return condition != null;
@@ -29,6 +30,6 @@ public class Counter implements Report {
 
 	@Override
 	public BSONObject getReducer() {
-		return new BasicBSONObject("type", "sum");
+		return new BasicBSONObject("type", Sum.ID);
 	}
 }

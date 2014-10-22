@@ -7,6 +7,8 @@ import org.bson.BSONObject;
  */
 public class Sum implements Reducer {
 
+    public static String ID = "sum";
+
 	protected String sumField;
 
 	public Sum(String sumField) {
