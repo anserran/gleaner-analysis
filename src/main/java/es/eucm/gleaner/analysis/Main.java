@@ -13,6 +13,6 @@ public class Main {
 		String mongoDB = System.getenv("MONGO_DB");
 		MongoAnalysis analysis = new MongoAnalysis(versionId, mongoHost,
 				mongoPort, mongoDB);
-		analysis.execute(null);
+		analysis.execute(null, true);
 	}
 }

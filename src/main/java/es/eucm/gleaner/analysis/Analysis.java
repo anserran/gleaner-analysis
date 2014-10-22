@@ -27,8 +27,8 @@ public class Analysis {
 				calculatedData);
 
 		TracesAnalyzer tracesAnalyzer = new TracesAnalyzer();
-		tracesAnalyzer.readFunctions(Q.getOrSet("functions", analysisData,
-				new ArrayList<String>()));
+		tracesAnalyzer.readFunctions(versionData,
+				Q.getOrSet("functions", analysisData, new ArrayList<String>()));
 
 		VariablesSetter variablesSetter = new VariablesSetter(Q.getOrSet(
 				"variables", analysisData, new BasicBSONObject()));
@@ -95,13 +95,13 @@ public class Analysis {
 			reducers.add(dataSegmentReducers);
 		}
 
-        BSONObject segmentResult;
+		BSONObject segmentResult;
 		if (gameplayResults.count() > 0) {
 			segmentResult = gameplayResults.map(reducers).reduce(reducers);
 		} else {
 			segmentResult = reducers.zero();
 		}
-        reducers.extraOperations(segmentResult);
-        return segmentResult;
+		reducers.extraOperations(segmentResult);
+		return segmentResult;
 	}
 }

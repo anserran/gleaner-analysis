@@ -1,12 +1,13 @@
 package es.eucm.gleaner.analysis;
 
 import com.mongodb.BasicDBObject;
-import es.eucm.gleaner.analysis.traces.SelectedOptions;
 import es.eucm.gleaner.analysis.traces.DoubleValue;
 import es.eucm.gleaner.analysis.traces.FunctionEvaluator;
+import es.eucm.gleaner.analysis.traces.SelectedOptions;
 import es.eucm.gleaner.analysis.traces.TraceAnalyzer;
 import es.eucm.gleaner.analysis.traces.ZoneReached;
 import es.eucm.gleaner.analysis.traces.ZoneTime;
+import es.eucm.gleaner.analysis.utils.Q;
 import org.apache.spark.api.java.function.PairFunction;
 import org.bson.BSONObject;
 import scala.Tuple2;
@@ -20,9 +21,13 @@ public class TracesAnalyzer implements
 		PairFunction<Tuple2<String, Iterable<BSONObject>>, Object, BSONObject>,
 		FunctionEvaluator {
 
+	private BSONObject versionData;
+
 	private ArrayList<TraceAnalyzer> traceAnalyzers = new ArrayList<TraceAnalyzer>();
 
-	public ArrayList<TraceAnalyzer> readFunctions(List<String> functions) {
+	public ArrayList<TraceAnalyzer> readFunctions(BSONObject versionData,
+			List<String> functions) {
+		this.versionData = versionData;
 		traceAnalyzers.clear();
 		try {
 			Context context = Context.enter();
@@ -69,7 +74,8 @@ public class TracesAnalyzer implements
 		for (int i = 1; i < arguments.size(); i++) {
 			choiceIds.add((String) arguments.get(i));
 		}
-		traceAnalyzers.add(new SelectedOptions(id, choiceIds));
+		traceAnalyzers.add(new SelectedOptions((List<BSONObject>) Q.get(
+				"choices", versionData), id, choiceIds));
 		return null;
 	}
 

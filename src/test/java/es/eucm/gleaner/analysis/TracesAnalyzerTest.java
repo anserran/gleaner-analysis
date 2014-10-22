@@ -17,7 +17,7 @@ public class TracesAnalyzerTest {
 	@Test
 	public void test() {
 		TracesAnalyzer traceAnalyzer = new TracesAnalyzer();
-		List<TraceAnalyzer> list = traceAnalyzer.readFunctions(Arrays.asList(
+		List<TraceAnalyzer> list = traceAnalyzer.readFunctions(null, Arrays.asList(
 				"ms('Inicio')", "doubleValue('a')", "reach('Tal')"));
 		assertEquals(list.size(), 3);
 		assertTrue(list.get(0) instanceof ZoneTime);

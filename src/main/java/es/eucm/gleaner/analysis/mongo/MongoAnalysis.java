@@ -8,7 +8,6 @@ import com.mongodb.Mongo;
 import com.mongodb.hadoop.MongoInputFormat;
 import es.eucm.gleaner.analysis.Analysis;
 import es.eucm.gleaner.analysis.utils.ExtractFieldAsKey;
-import es.eucm.gleaner.analysis.utils.Q;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -76,10 +75,9 @@ public class MongoAnalysis extends Analysis {
 						config, MongoInputFormat.class, Object.class,
 						BSONObject.class);
 
-				DBObject calculatedData = db.getCollection("calculated_data")
-						.findOne(
-								new BasicDBObject("versionId", versionData
-										.get("_id")));
+				DBObject calculatedData = force ? null : db.getCollection(
+						"calculated_data").findOne(
+						new BasicDBObject("versionId", versionData.get("_id")));
 
 				if (calculatedData == null) {
 					calculatedData = new BasicDBObject();
@@ -125,13 +123,10 @@ public class MongoAnalysis extends Analysis {
 				// Write to mongo segment results
 				DBCollection collection = db.getCollection("segments_"
 						+ versionId);
+				collection.drop();
 
 				for (BSONObject segmentResult : segmentResults) {
-					collection.update(
-							new BasicDBObject("_name", Q.get("_name",
-									segmentResult)), new BasicDBObject("$set",
-									new BasicDBObject(segmentResult.toMap())),
-							true, false);
+					collection.insert(new BasicDBObject(segmentResult.toMap()));
 				}
 
 				// Store calculated data
